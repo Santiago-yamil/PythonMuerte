@@ -1,7 +1,7 @@
 from fastapi import APIRouter, UploadFile
 
 from app.services.ai_service import AIService
-from app.services.ai_service import AIService
+
 from app.services.ocr_service import OCRService
 
 
@@ -32,7 +32,7 @@ async def validar_documento(file: UploadFile, nombre: str, curp: str):
         "texto_extraido": texto,
         "validacion": validacion
     }
-router = APIRouter()
+
 
 @router.get("/")
 async def get_validaciones():
