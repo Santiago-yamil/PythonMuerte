@@ -1,6 +1,10 @@
 from fastapi import APIRouter, UploadFile
-from services.ocr_service import OCRService
-from services.ai_service import AIService
+
+from app.services.ai_service import AIService
+from app.services.ai_service import AIService
+from app.services.ocr_service import OCRService
+
+
 
 router = APIRouter()
 ocr_service = OCRService()
@@ -28,3 +32,8 @@ async def validar_documento(file: UploadFile, nombre: str, curp: str):
         "texto_extraido": texto,
         "validacion": validacion
     }
+router = APIRouter()
+
+@router.get("/")
+async def get_validaciones():
+    return {"message": "Lista de validaciones"}

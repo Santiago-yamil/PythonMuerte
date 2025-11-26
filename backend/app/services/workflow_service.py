@@ -1,9 +1,11 @@
 # app/services/workflow_service.py
 
 from sqlalchemy.orm import Session
-
 from app.models.solicitud import Solicitud, EstadoSolicitud
 from app.core.workflow import puede_transicionar, Rol
+from app.models.auditoria import Auditoria
+from datetime import datetime
+import uuid
 
 
 class WorkflowError(Exception):
@@ -31,10 +33,20 @@ def actualizar_estado_solicitud(db: Session, curp: str, rol: Rol, nuevo_estado: 
 
     # 3. Actualizar estado
     solicitud.estado = nuevo_estado
-
-    # 4. Guardar cambios
     db.commit()
     db.refresh(solicitud)
+
+    # 4. Registrar auditoría
+    registro = Auditoria(
+        id=str(uuid.uuid4()),
+        curp=curp,
+        rol=rol.name,
+        estado_anterior=estado_actual.value,
+        estado_nuevo=nuevo_estado.value,
+        fecha=datetime.utcnow()
+    )
+    db.add(registro)
+    db.commit()
 
     return solicitud
 
@@ -43,6 +55,5 @@ def obtener_transiciones_para_rol(rol: Rol, estado_actual: EstadoSolicitud):
     """
     Devuelve los posibles estados a los que el rol puede mover la solicitud.
     """
-
     from app.core.workflow import obtener_transiciones_posibles
     return obtener_transiciones_posibles(rol, estado_actual)
